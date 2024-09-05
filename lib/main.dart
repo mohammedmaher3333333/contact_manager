@@ -1,5 +1,4 @@
 import 'package:contact_manager/cubits/contact_cubit/contact_cubit.dart';
-import 'package:contact_manager/cubits/drop_down_cubit/drop_down_cubit.dart';
 import 'package:contact_manager/cubits/navigation_bar/navigation_bar_cubit.dart';
 import 'package:contact_manager/routes/main_view.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +29,6 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<ContactCubit>(
             create: (context) => ContactCubit()..getData(),
-          ),
-          BlocProvider<DropDownCubit>(
-            create: (context) => DropDownCubit(),
           ),
         ],
         child: const MaterialApp(

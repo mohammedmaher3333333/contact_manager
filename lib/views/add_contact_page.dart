@@ -1,5 +1,5 @@
 import 'package:contact_manager/cubits/contact_cubit/contact_cubit.dart';
-import 'package:contact_manager/cubits/drop_down_cubit/drop_down_cubit.dart';
+import 'package:contact_manager/widgets/add_contacts/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +13,7 @@ class AddContactPage extends StatelessWidget {
         // TODO: implement listener
       },
       builder: (context, state) {
-        // var contact=ContactCubit.get(context);
+        var contactCubit = ContactCubit.get(context);
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Scaffold(
@@ -34,7 +34,7 @@ class AddContactPage extends StatelessWidget {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () {
-                        ContactCubit.get(context).insertData();
+                        contactCubit.insertData();
                         print("Add new item");
                       },
                       child: const Text(
@@ -52,8 +52,7 @@ class AddContactPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              AssetImage(ContactCubit.get(context).imagePath),
+                          backgroundImage: AssetImage(contactCubit.imagePath),
                         ),
                         const SizedBox(height: 10),
                         const Center(
@@ -67,94 +66,32 @@ class AddContactPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        TextFormField(
-                          controller:
-                              ContactCubit.get(context).firstNameTextController,
+                        buildTextFormField(
+                          controller: contactCubit.firstNameTextController,
                           keyboardType: TextInputType.name,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.person),
-                            border: OutlineInputBorder(),
-                            hintText: 'First name',
-                          ),
+                          icon: Icons.person,
+                          hint: 'First name',
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          controller:
-                              ContactCubit.get(context).lastNameTextController,
+                        buildTextFormField(
+                          controller: contactCubit.lastNameTextController,
                           keyboardType: TextInputType.name,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.person),
-                            border: OutlineInputBorder(),
-                            hintText: 'Last name',
-                          ),
+                          icon: Icons.person,
+                          hint: 'Last name',
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          controller:
-                              ContactCubit.get(context).companyTextController,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.home_work_outlined),
-                            border: OutlineInputBorder(),
-                            hintText: 'Company',
-                          ),
+                        buildTextFormField(
+                          controller: contactCubit.companyTextController,
+                          keyboardType: null,
+                          icon: Icons.home_work_outlined,
+                          hint: 'Company',
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          controller: ContactCubit.get(context)
-                              .phoneNumberTextController,
+                        buildTextFormField(
+                          controller: contactCubit.phoneNumberTextController,
                           keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.phone),
-                            border: OutlineInputBorder(),
-                            hintText: 'Phone',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        BlocConsumer<DropDownCubit, DropDownState>(
-                          listener: (context, state) {
-                            // TODO: implement listener
-                          },
-                          builder: (context, state) {
-                            return Container(
-                              margin:
-                                  const EdgeInsets.only(left: 40, right: 150),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                              ),
-                              child: DropdownButton<int>(
-                                isExpanded: true,
-                                value:
-                                    DropDownCubit.get(context).selectedValue,
-                                items:
-                                    DropDownCubit.get(context).dropdownItems,
-                                onChanged: (value) {
-                                  DropDownCubit.get(context).onChangLabel(
-                                      context: context, value: value);
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller:
-                              ContactCubit.get(context).emailTextController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
-                            hintText: 'Email',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.date_range_outlined),
-                            border: OutlineInputBorder(),
-                            hintText: 'Significant date',
-                          ),
+                          icon: Icons.phone,
+                          hint: 'Phone',
                         ),
                         const SizedBox(height: 10),
                         Container(
@@ -165,32 +102,62 @@ class AddContactPage extends StatelessWidget {
                           ),
                           child: DropdownButton<int>(
                             isExpanded: true,
-                            value: 1,
-                            items: const [
-                              DropdownMenuItem(value: 1, child: Text('data1')),
-                              DropdownMenuItem(value: 2, child: Text('data2')),
-                              DropdownMenuItem(value: 3, child: Text('data3')),
-                              DropdownMenuItem(value: 4, child: Text('data4')),
-                              DropdownMenuItem(value: 5, child: Text('data5')),
-                            ],
-                            onChanged: (value) {},
+                            value: contactCubit.selectedValuePhone,
+                            items: contactCubit.dropdownItemsPhone,
+                            onChanged: (value) {
+                              contactCubit.onChangLabelPhone(
+                                context: context,
+                                value: value,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.location_on_outlined),
-                            border: OutlineInputBorder(),
-                            hintText: 'Address',
+                        buildTextFormField(
+                          controller: contactCubit.emailTextController,
+                          keyboardType: TextInputType.emailAddress,
+                          icon: Icons.email_outlined,
+                          hint: 'Email',
+                        ),
+                        const SizedBox(height: 10),
+                        buildTextFormField(
+                          controller: contactCubit.significantTextController,
+                          icon: Icons.date_range_outlined,
+                          hint: 'Significant date',
+                          keyboardType: TextInputType.datetime,
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          margin: const EdgeInsets.only(left: 40, right: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: DropdownButton<int>(
+                            isExpanded: true,
+                            value: contactCubit.selectedValueSignificant,
+                            items: contactCubit.dropdownItemsSignificant,
+                            onChanged: (value) {
+                              contactCubit.onChangLabelSignificant(
+                                context: context,
+                                value: value,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.note_outlined),
-                            border: OutlineInputBorder(),
-                            hintText: 'Notes',
-                          ),
+                        buildTextFormField(
+                          controller: contactCubit.addressTextController,
+                          icon: Icons.location_on_outlined,
+                          hint: 'Address',
+                          keyboardType: null,
+                        ),
+                        const SizedBox(height: 10),
+                        buildTextFormField(
+                          controller: contactCubit.notesTextController,
+                          icon: Icons.note_outlined,
+                          hint: 'Notes',
+                          keyboardType: null,
                         ),
                       ],
                     ),

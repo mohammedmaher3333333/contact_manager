@@ -12,6 +12,7 @@ class ContactCubit extends Cubit<ContactState> {
   static ContactCubit get(context) => BlocProvider.of(context);
 
   final String _contactTableName = 'contacts';
+  final String _contactColumnID = 'id';
   final String _contactColumnFirstName = 'firstName';
   final String _contactColumnLastName = 'lastName';
   final String _contactColumnImage = 'image';
@@ -26,13 +27,14 @@ class ContactCubit extends Cubit<ContactState> {
 
   var firstNameTextController = TextEditingController();
   var lastNameTextController = TextEditingController();
-  String imagePath='assets/images/male.jpeg' ;
+  String imagePath = 'assets/images/male.jpeg';
+
   var companyTextController = TextEditingController();
   var phoneNumberTextController = TextEditingController();
-  String labelPhone ='';
+  String labelPhone = '';
   var emailTextController = TextEditingController();
   var significantTextController = TextEditingController();
-  var labelSignificantTextController = TextEditingController();
+  var labelSignificant = '';
   var addressTextController = TextEditingController();
   var notesTextController = TextEditingController();
 
@@ -61,7 +63,7 @@ class ContactCubit extends Cubit<ContactState> {
   void _onCreateDatabase(Database db, int version) async {
     await db.execute(
       '''CREATE TABLE $_contactTableName 
-             (id INTEGER PRIMARY KEY,
+             ($_contactColumnID INTEGER PRIMARY KEY,
               $_contactColumnFirstName TEXT,
               $_contactColumnLastName TEXT,
               $_contactColumnImage BLOB,
@@ -84,7 +86,6 @@ class ContactCubit extends Cubit<ContactState> {
     Database? myDb = await database;
     await myDb.query(_contactTableName).then((value) {
       contactsList = value;
-      print('contacts list  $contactsList');
       emit(GetAllNumbersSuccessState());
     }).catchError((onError) {
       emit(GetAllNumbersErrorState());
@@ -103,11 +104,11 @@ class ContactCubit extends Cubit<ContactState> {
       _contactColumnLabelPhone: labelPhone ?? '',
       _contactColumnEmail: emailTextController.text ?? '',
       _contactColumnSignificantDate: significantTextController.text ?? '',
-      _contactColumnLabelSignificant: labelSignificantTextController.text ?? '',
+      _contactColumnLabelSignificant: labelSignificant ?? '',
       _contactColumnAddress: addressTextController.text ?? '',
       _contactColumnNotes: notesTextController.text ?? '',
-    }).then((value) async{
-      await getData(); // للحصول على البيانات الجديدة
+    }).then((value) async {
+      getData();
       emit(AddContactSuccessState());
     }).catchError((onError) {
       emit(AddContactErrorState());
@@ -115,32 +116,80 @@ class ContactCubit extends Cubit<ContactState> {
     });
   }
 
+  removeData(id) async {
+    var myDb = await database;
+    await myDb
+        .delete(_contactTableName, where: '$id == $_contactColumnID')
+        .then((value) {
+      emit(RemoveNumbersState());
+    }).catchError((onError) {
+      emit(RemoveNumbersErrorState());
+      print(onError.toString());
+    });
+  }
 
-// removeData(id) async {
-//   var databasesPath = await getDatabasesPath();
-//   String path = join(databasesPath, 'goals.db');
-//   Database database = await openDatabase(path);
-//
-//   await database
-//       .rawDelete('DELETE FROM Goals WHERE id = ?', ['$id']).then((value) {
-//     emit(RemoveDataSuccessState());
-//   }).catchError((onError) {
-//     emit(RemoveDataErrorState());
-//     print(onError.toString());
-//   });
-// }
-//
-// updateData({required int id, required String name}) async {
-//   var databasesPath = await getDatabasesPath();
-//   String path = join(databasesPath, 'goals.db');
-//   Database database = await openDatabase(path);
-//   await database
-//       .update('Goals', {'name': name}, where: 'id == $id')
-//       .then((value) {
-//     emit(RemoveDataSuccessState());
-//   }).catchError((onError) {
-//     emit(RemoveDataErrorState());
-//     print(onError.toString());
-//   });
-// }
+  updateData({required int id, required String name}) async {
+    var myDb = await database;
+    await myDb
+        .update(
+            _contactTableName,
+            {
+              _contactColumnFirstName: name,
+            },
+            where: 'id == $id')
+        .then((value) {
+      emit(UpdateNumbersState());
+    }).catchError((onError) {
+      emit(UpdateNumbersErrorState());
+      print(onError.toString());
+    });
+  }
+
+///////////// label phone
+  int? selectedValuePhone = 2;
+
+  // لائحة العناصر
+  final List<DropdownMenuItem<int>> dropdownItemsPhone = const [
+    DropdownMenuItem(value: 1, child: Text('No Label')),
+    DropdownMenuItem(value: 2, child: Text('Mobile')),
+    DropdownMenuItem(value: 3, child: Text('Work')),
+    DropdownMenuItem(value: 4, child: Text('Home')),
+    DropdownMenuItem(value: 5, child: Text('Main')),
+    DropdownMenuItem(value: 6, child: Text('Work Fax')),
+    DropdownMenuItem(value: 7, child: Text('Home Fax')),
+    DropdownMenuItem(value: 8, child: Text('Pager')),
+    DropdownMenuItem(value: 9, child: Text('Other')),
+    DropdownMenuItem(value: 10, child: Text('Custom')),
+  ];
+
+  onChangLabelPhone({required context, required value}) {
+    selectedValuePhone = value;
+
+    ContactCubit.get(context).labelPhone = (dropdownItemsPhone
+            .firstWhere((item) => item.value == selectedValuePhone)
+            .child as Text)
+        .data!;
+    emit(ChoseLabelPhoneState());
+  }
+
+  ///////////// label Significant
+  int? selectedValueSignificant = 2;
+
+  // لائحة العناصر
+  final List<DropdownMenuItem<int>> dropdownItemsSignificant = const [
+    DropdownMenuItem(value: 1, child: Text('No Label')),
+    DropdownMenuItem(value: 2, child: Text('Birthday')),
+    DropdownMenuItem(value: 3, child: Text('Anniversary')),
+    DropdownMenuItem(value: 4, child: Text('Other')),
+    DropdownMenuItem(value: 5, child: Text('Custom')),
+  ];
+
+  onChangLabelSignificant({required context, required value}) {
+    selectedValueSignificant = value;
+    ContactCubit.get(context).labelSignificant = (dropdownItemsSignificant
+            .firstWhere((item) => item.value == selectedValueSignificant)
+            .child as Text)
+        .data!;
+    emit(ChoseLabelSignificantState());
+  }
 }

@@ -68,7 +68,7 @@ class ContactsPage extends StatelessWidget {
                                 fontSize: 18,
                               ),
                             ),
-                            Text(contactCubit.contactsList[index]['number']),
+                            Text(contactCubit.contactsList[index]['number'].toString()),
                           ],
                         ),
                         const Spacer(),
