@@ -1,4 +1,5 @@
 import 'package:contact_manager/cubits/contact_cubit/contact_cubit.dart';
+import 'package:contact_manager/cubits/drop_down_cubit/drop_down_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,6 +13,7 @@ class AddContactPage extends StatelessWidget {
         // TODO: implement listener
       },
       builder: (context, state) {
+        // var contact=ContactCubit.get(context);
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Scaffold(
@@ -22,8 +24,8 @@ class AddContactPage extends StatelessWidget {
                   children: [
                     const Text(
                       'Create contact',
-                      style: TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
                     ElevatedButton(
@@ -33,6 +35,7 @@ class AddContactPage extends StatelessWidget {
                       ),
                       onPressed: () {
                         ContactCubit.get(context).insertData();
+                        print("Add new item");
                       },
                       child: const Text(
                         'Save',
@@ -47,10 +50,10 @@ class AddContactPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage(
-                              'assets/images/male.jpeg'),
+                          backgroundImage:
+                              AssetImage(ContactCubit.get(context).imagePath),
                         ),
                         const SizedBox(height: 10),
                         const Center(
@@ -65,7 +68,9 @@ class AddContactPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
-                          keyboardType: TextInputType.phone,
+                          controller:
+                              ContactCubit.get(context).firstNameTextController,
+                          keyboardType: TextInputType.name,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.person),
                             border: OutlineInputBorder(),
@@ -74,7 +79,9 @@ class AddContactPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                          keyboardType: TextInputType.number,
+                          controller:
+                              ContactCubit.get(context).lastNameTextController,
+                          keyboardType: TextInputType.name,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.person),
                             border: OutlineInputBorder(),
@@ -83,6 +90,8 @@ class AddContactPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
+                          controller:
+                              ContactCubit.get(context).companyTextController,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.home_work_outlined),
                             border: OutlineInputBorder(),
@@ -91,6 +100,9 @@ class AddContactPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
+                          controller: ContactCubit.get(context)
+                              .phoneNumberTextController,
+                          keyboardType: TextInputType.phone,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.phone),
                             border: OutlineInputBorder(),
@@ -98,29 +110,38 @@ class AddContactPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        Container(
-                          margin: const EdgeInsets.only(left: 40, right: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: DropdownButton<int>(
-                            isExpanded: true,
-                            value: 1,
-                            items: const [
-                              DropdownMenuItem(value: 1, child: Text('data1')),
-                              DropdownMenuItem(value: 2, child: Text('data2')),
-                              DropdownMenuItem(value: 3, child: Text('data3')),
-                              DropdownMenuItem(value: 4, child: Text('data4')),
-                              DropdownMenuItem(value: 5, child: Text('data5')),
-                            ],
-                            onChanged: (value) {},
-                          ),
+                        BlocConsumer<DropDownCubit, DropDownState>(
+                          listener: (context, state) {
+                            // TODO: implement listener
+                          },
+                          builder: (context, state) {
+                            return Container(
+                              margin:
+                                  const EdgeInsets.only(left: 40, right: 150),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                              ),
+                              child: DropdownButton<int>(
+                                isExpanded: true,
+                                value:
+                                    DropDownCubit.get(context).selectedValue,
+                                items:
+                                    DropDownCubit.get(context).dropdownItems,
+                                onChanged: (value) {
+                                  DropDownCubit.get(context).onChangLabel(
+                                      context: context, value: value);
+                                },
+                              ),
+                            );
+                          },
                         ),
-
                         const SizedBox(height: 10),
                         TextFormField(
+                          controller:
+                              ContactCubit.get(context).emailTextController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             icon: Icon(Icons.email_outlined),
                             border: OutlineInputBorder(),
@@ -136,7 +157,6 @@ class AddContactPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 10),
-
                         Container(
                           margin: const EdgeInsets.only(left: 40, right: 150),
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -156,7 +176,6 @@ class AddContactPage extends StatelessWidget {
                             onChanged: (value) {},
                           ),
                         ),
-
                         const SizedBox(height: 10),
                         TextFormField(
                           decoration: const InputDecoration(

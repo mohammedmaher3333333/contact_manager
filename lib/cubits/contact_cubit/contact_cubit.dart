@@ -26,9 +26,10 @@ class ContactCubit extends Cubit<ContactState> {
 
   var firstNameTextController = TextEditingController();
   var lastNameTextController = TextEditingController();
+  String imagePath='assets/images/male.jpeg' ;
   var companyTextController = TextEditingController();
   var phoneNumberTextController = TextEditingController();
-  var labelPhoneTextController = TextEditingController();
+  String labelPhone ='';
   var emailTextController = TextEditingController();
   var significantTextController = TextEditingController();
   var labelSignificantTextController = TextEditingController();
@@ -89,31 +90,31 @@ class ContactCubit extends Cubit<ContactState> {
       emit(GetAllNumbersErrorState());
       print(onError.toString());
     });
-    myDb.close();
   }
 
   insertData() async {
     Database? myDb = await database;
     await myDb.insert(_contactTableName, {
-      _contactColumnImage: 'assets/images/male.jpeg',
-      _contactColumnFirstName: firstNameTextController ?? '',
-      _contactColumnLastName: lastNameTextController ?? '',
-      _contactColumnCompanyName: companyTextController ?? '',
-      _contactColumnNumPhone: phoneNumberTextController ?? '',
-      _contactColumnLabelPhone: labelPhoneTextController ?? '',
-      _contactColumnEmail: emailTextController ?? '',
-      _contactColumnSignificantDate: significantTextController ?? '',
-      _contactColumnLabelSignificant: labelSignificantTextController ?? '',
-      _contactColumnAddress: addressTextController ?? '',
-      _contactColumnNotes: notesTextController ?? '',
-    }).then((value) {
+      _contactColumnImage: imagePath,
+      _contactColumnFirstName: firstNameTextController.text ?? '',
+      _contactColumnLastName: lastNameTextController.text ?? '',
+      _contactColumnCompanyName: companyTextController.text ?? '',
+      _contactColumnNumPhone: phoneNumberTextController.text ?? '',
+      _contactColumnLabelPhone: labelPhone ?? '',
+      _contactColumnEmail: emailTextController.text ?? '',
+      _contactColumnSignificantDate: significantTextController.text ?? '',
+      _contactColumnLabelSignificant: labelSignificantTextController.text ?? '',
+      _contactColumnAddress: addressTextController.text ?? '',
+      _contactColumnNotes: notesTextController.text ?? '',
+    }).then((value) async{
+      await getData(); // للحصول على البيانات الجديدة
       emit(AddContactSuccessState());
     }).catchError((onError) {
       emit(AddContactErrorState());
       print(onError.toString());
     });
-    myDb.close();
   }
+
 
 // removeData(id) async {
 //   var databasesPath = await getDatabasesPath();
