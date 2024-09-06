@@ -126,6 +126,7 @@ class ContactCubit extends Cubit<ContactState> {
       emit(RemoveNumbersErrorState());
       print(onError.toString());
     });
+    getData();
   }
 
   updateData({required int id, required String name}) async {
