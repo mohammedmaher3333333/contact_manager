@@ -1,3 +1,4 @@
+import 'package:contact_manager/widgets/contacts_page/contact_functions.dart';
 import 'package:flutter/material.dart';
 
 class KeypadPage extends StatefulWidget {
@@ -21,8 +22,7 @@ class _KeypadPageState extends State<KeypadPage> {
   void _makeCall() {
     String number = _controller.text;
     if (number.isNotEmpty) {
-      print('Calling $number...');
-      // هنا يمكنك إضافة وظيفة الاتصال الحقيقية حسب الاحتياج
+      makePhoneCall(phoneNumber: number);
     }
   }
 
@@ -74,7 +74,8 @@ class _KeypadPageState extends State<KeypadPage> {
                   // لوحة مفاتيح مخصصة
                   GridView.builder(
                     shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3, // عدد الأزرار في كل صف
                       childAspectRatio: 2,
                     ),
@@ -144,4 +145,3 @@ class _KeypadPageState extends State<KeypadPage> {
     );
   }
 }
-
