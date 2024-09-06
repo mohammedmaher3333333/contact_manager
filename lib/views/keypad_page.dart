@@ -23,6 +23,7 @@ class _KeypadPageState extends State<KeypadPage> {
     String number = _controller.text;
     if (number.isNotEmpty) {
       makePhoneCall(phoneNumber: number);
+      _controller.clear();
     }
   }
 

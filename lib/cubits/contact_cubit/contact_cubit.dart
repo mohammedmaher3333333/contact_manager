@@ -24,11 +24,12 @@ class ContactCubit extends Cubit<ContactState> {
   final String _contactColumnLabelSignificant = 'label_significant';
   final String _contactColumnAddress = 'address';
   final String _contactColumnNotes = 'notes';
+  final String _contactColumnRecent = 'recent';
+  final String _contactColumnFavorite = 'favorite';
 
   var firstNameTextController = TextEditingController();
   var lastNameTextController = TextEditingController();
   String imagePath = 'assets/images/male.jpeg';
-
   var companyTextController = TextEditingController();
   var phoneNumberTextController = TextEditingController();
   String labelPhone = '';
@@ -54,8 +55,9 @@ class ContactCubit extends Cubit<ContactState> {
 
     _database ??= await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreateDatabase,
+      onUpgrade: _onUpgrade,
     );
     return _database!;
   }
@@ -75,11 +77,22 @@ class ContactCubit extends Cubit<ContactState> {
               $_contactColumnLabelSignificant TEXT,
               $_contactColumnAddress TEXT,
               $_contactColumnNotes TEXT
+
                )''',
     );
   }
 
+  void _onUpgrade(db, oldVersion, newVersion) {
+    if (oldVersion < 2) {
+      db.execute(
+          "ALTER TABLE $_contactTableName ADD COLUMN $_contactColumnRecent INTEGER DEFAULT 0");
+    }
+  }
+
   List<Map> contactsList = [];
+  List<Map> contactsListRecent = [];
+
+  List<Map> contactsListFavorite = [];
 
   // Fetch all contacts from the database
   getData() async {
@@ -93,6 +106,33 @@ class ContactCubit extends Cubit<ContactState> {
     });
   }
 
+  getDataRecent() async {
+    Database? myDb = await database;
+    await myDb
+        .query(_contactTableName, where: '$_contactColumnRecent = 1')
+        .then((value) {
+      contactsListRecent = value;
+      emit(GetRecentSuccessState());
+    }).catchError((onError) {
+      emit(GetRecentErrorState());
+      print(onError.toString());
+    });
+  }
+
+  getDataFavorite() async {
+    Database? myDb = await database;
+    await myDb
+        .query(_contactTableName, where: _contactColumnFavorite)
+        .then((value) {
+      contactsListFavorite = value;
+      emit(GetFavoriteSuccessState());
+    }).catchError((onError) {
+      emit(GetFavoriteErrorState());
+      print(onError.toString());
+    });
+  }
+
+  //main insert
   insertData() async {
     Database? myDb = await database;
     await myDb.insert(_contactTableName, {
@@ -116,6 +156,28 @@ class ContactCubit extends Cubit<ContactState> {
     });
   }
 
+  // insert to recent
+  insertToRecent(int contactId) async {
+    Database? myDb = await database;
+    await myDb
+        .update(
+      _contactTableName,
+      {
+        _contactColumnRecent: 1, // الإشارة إلى أن جهة الاتصال حديثة
+      },
+      where: '$_contactColumnID = ?',
+      whereArgs: [contactId],
+    )
+        .then((value) async {
+      print("recents ${_contactColumnRecent.length}");
+      emit(AddContactSuccessState());
+    }).catchError((onError) {
+      emit(AddContactErrorState());
+      print(onError.toString());
+    });
+    getDataRecent();
+  }
+
   removeData(id) async {
     var myDb = await database;
     await myDb
@@ -127,6 +189,26 @@ class ContactCubit extends Cubit<ContactState> {
       print(onError.toString());
     });
     getData();
+  }
+
+  removeFromRecent(int contactId) async {
+    Database? myDb = await database;
+    await myDb
+        .update(
+      _contactTableName,
+      {
+        _contactColumnRecent: 0, // جعل جهة الاتصال غير حديثة
+      },
+      where: '$_contactColumnID = ?',
+      whereArgs: [contactId],
+    )
+        .then((value) {
+      getDataRecent();
+      emit(RemoveRecentSuccessState());
+    }).catchError((onError) {
+      emit(RemoveRecentErrorState());
+      print(onError.toString());
+    });
   }
 
   updateData({required int id, required String name}) async {

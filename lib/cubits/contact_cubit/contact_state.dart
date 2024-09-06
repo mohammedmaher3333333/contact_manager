@@ -5,13 +5,20 @@ sealed class ContactState {}
 final class ContactInitial extends ContactState {}
 
 //recent states
-final class RecentSuccessState extends ContactState {}
+final class GetRecentSuccessState extends ContactState {}
 
-final class RecentErrorState extends ContactState {}
+final class GetRecentErrorState extends ContactState {}
 
 final class AddRecentErrorState extends ContactState {}
 
+final class RemoveRecentSuccessState extends ContactState {}
+
 final class RemoveRecentErrorState extends ContactState {}
+
+//favorite states
+final class GetFavoriteSuccessState extends ContactState {}
+
+final class GetFavoriteErrorState extends ContactState {}
 
 //Contacts Page
 final class GetAllNumbersSuccessState extends ContactState {}

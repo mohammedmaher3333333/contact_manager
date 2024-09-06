@@ -43,8 +43,8 @@ class ContactsPage extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ListTile(
-                                    leading:
-                                        const Icon(Icons.delete, color: Colors.red),
+                                    leading: const Icon(Icons.delete,
+                                        color: Colors.red),
                                     title: const Text('Delete'),
                                     onTap: () {
                                       contactCubit.removeData(contactCubit
@@ -82,8 +82,10 @@ class ContactsPage extends StatelessWidget {
                           IconButton(
                             onPressed: () {
                               makePhoneCall(
-                                  phoneNumber: contactCubit.contactsList[index]
-                                      ['number']);
+                                phoneNumber: contactCubit.contactsList[index]
+                                    ['number'],
+                              );
+                              contactCubit.insertToRecent(index);
                             },
                             icon: const Icon(
                               Icons.phone_forwarded_outlined,
